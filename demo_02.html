@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>a stateful component</title>
+    <script src="https://unpkg.com/react@latest/dist/react.js"></script>
+    <script src="https://unpkg.com/react-dom@latest/dist/react-dom.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="example"></div>
+    <script type="text/babel">
+    //使用es6的class创建react组件，继承React.Component
+    class Timer extends React.Component{
+      constructor(props){
+        super(props);
+        this.state={secondsElapse:0};
+      }
+      tick(){
+        this.setState((prevState)=>({secondsElapse:prevState.secondsElapse+1}));
+      }
+      componentDidMount(){
+        this.interval = setInterval( ()=>this.tick(),1000 );
+      }
+      componentWillUnmount(){
+        clearInterval(this.interval);
+      }
+      render(){
+        return (<div>Seconds elapse: {this.state.secondsElapse}</div>);
+      }
+    }
+
+    ReactDOM.render(
+      <Timer/>,
+      document.getElementById("example")
+    ); 
+    </script>
+  </body>
+</html>
