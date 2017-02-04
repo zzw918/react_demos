@@ -26,12 +26,12 @@
         clearInterval(this.interval);
       }
       render(){
-        return (<div>Seconds elapse: {this.state.secondsElapse}</div>);
+        return (<div style={{color:"red",fontSize:"30px"}} >Hi,{this.props.name},seconds elapse: {this.state.secondsElapse}</div>);
       }
     }
 
     ReactDOM.render(
-      <Timer/>,
+      <Timer name="zzw"/>,
       document.getElementById("example")
     ); 
     </script>
