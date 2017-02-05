@@ -6,86 +6,54 @@
     <script src="https://unpkg.com/react@latest/dist/react.js"></script>
     <script src="https://unpkg.com/react-dom@latest/dist/react-dom.js"></script>
     <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/remarkable/1.7.1/remarkable.min.js"></script>
+    <!-- 上面引入了用于编辑markdown的库remarkeble.js -->
   </head>
-  <body>
     <div id="example"></div>
     <script type="text/babel">
-      class TodoApp extends React.Component{
-        constructor(props){
-          super(props);
-          this.handleChange = this.handleChange.bind(this);
-          this.handleSubmit = this.handleSubmit.bind(this);
-          this.state={
-            items:[],
-            text:''
-          };
-          //form和TodoList都需要用到state，所以将state放在最外面，即state提升
-        }
-        
-        render(){
-          var titleStyle={
-            color:"red"
-          }
-          //注意：这个样式对象只能放在这里，class中都是方法
-          return (
-            <div>
-              <h2 style={titleStyle}>添加列表</h2>
-              <TodoList listItems={this.state.items} />
-              <form onSubmit={this.handleSubmit}>
-                <input onChange={this.handleChange} value={this.state.text}/>
-                <button>{'已添加'+(this.state.items.length)}</button>
-              </form>
-            </div>                            
-          );
-        }
-
-        handleChange(e){
-          this.setState({text:e.target.value});
-         //注意：如果不需要用到prevState，就不能给setState中传递函数，如this.setState(()=>({text:e.target.value}))，会报错
-        }
-
-        handleSubmit(e){
-          e.preventDefault();
-          var newItem = {
-            text: this.state.text,
-            id: Date.now()
-          };
-          this.setState((prev)=>({
-            items:prev.items.concat(newItem),
-            text:''
-          }));
-          //因为这里需要使用prevState所以要传入函数，参数默认就是prevState，当然你写成prev也没有问题。
-        }
-      } 
-
-      class TodoList extends React.Component{
-        render(){
-          var listStyle = {
-            marginLeft:"-38px",
-            marginTop:'15px',
-            width:"200px",
-            height:"30px",
-            listStyle:"none",
-            borderWidth:"1px",
-            borderColor:"red",
-            borderStyle:"solid"
-          };
-          return (
-          <ul>
-            {this.props.listItems.map((item)=>(
-              <li key={item.id} style={listStyle}>
-              {item.text}
-              </li>
-            ))
-            }    
-          </ul>
-          );
-        }
+    class UseMarkDown extends React.Component{
+      constructor(props){
+        super(props);
+        this.handleChange = this.handleChange.bind(this);
+        this.state = {value: ""};
       }
-      ReactDOM.render(
-        <TodoApp/>,
-        document.getElementById("example")
-      );
+      handleChange(){
+        this.setState( {value: this.refs.textarea.value} );
+      }
+      getRawMarkup(){
+        var md = new Remarkable();
+        return { __html: md.render(this.state.value)};
+      }
+      render(){
+        var textareaStyle = {
+          width:"500px",
+          height:"250px",
+          fontSize:"25px"
+        };
+        {/*注意：这里必须用var声明，否则会报错*/}
+        var contentStyle = {
+          width:500,
+          height:250,
+          border:"1px solid red"
+        };
+        {/*可以看到这里可以直接用border这种样式，并且对于width和height也可以不写px这个单位，可以自动识别*/}
+        return (
+          <div className="MarkdownDiv">
+            {/*JSX语法中，类名要用className防止和es6中的class冲突，注意注释的方法*/}
+            <h2>Input MarkdownSyntax</h2>            
+            <textarea ref="textarea" onChange={this.handleChange} value={this.state.value} placeholder="输入markdown语法..."  style={textareaStyle} />
+            <h2>Output HTML</h2>
+            <div className="content" dangerouslySetInnerHTML = { this.getRawMarkup() } style={contentStyle} />
+            {/*注意：这里一定要用this.getRawMarkup()。this表示这个组件！*/}
+          </div>
+        );
+      }
+    }
+
+    ReactDOM.render(
+      <UseMarkDown/>,
+      document.getElementById("example")
+    );
     </script>
   </body>
 </html>
